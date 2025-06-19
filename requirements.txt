@@ -1,0 +1,10 @@
+# Core dependencies
+numpy>=1.24
+PyYAML>=6.0
+pytest>=8.0
+
+# Optional but recommended for advanced validation
+jsonschema>=4.19.0        # for JSON structure enforcement
+pint>=0.23                # for unit checking (if used in metadata)
+
+
