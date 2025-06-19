@@ -19,8 +19,21 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 📦 Install dependencies
+      - name: 📦 Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: 📦 Install Dropbox SDK
+        run: pip install dropbox
+
+      - name: 🔓 Make download script executable
+        run: chmod +x src/download_from_dropbox.sh
+
+      - name: ⬇️ Download files from Dropbox
+        env:
+          APP_KEY: ${{ secrets.APP_KEY }}
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        run: src/download_from_dropbox.sh
 
       - name: ✅ Validate fluid_simulation_input.json
         run: python validators/validate_fluid_simulation_input.py
