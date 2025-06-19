@@ -1,0 +1,44 @@
+name: Run Integrity Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  integrity-check:
+    name: Integrity Investigation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: ✅ Validate fluid_simulation_input.json
+        run: python validators/validate_fluid_simulation_input.py
+
+      - name: ✅ Validate navier_stokes_results.json
+        run: python validators/validate_navier_stokes_results.py
+
+      - name: ✅ Validate field history and grid metadata
+        run: python validators/validate_field_history_and_grid.py
+
+      - name: ✅ Validate fluid_particles.npy
+        run: python validators/validate_fluid_particles.py
+
+      - name: ✅ Validate fluid_mesh_data.json
+        run: python validators/validate_fluid_mesh_data.py
+
+      - name: ✅ Validate fluid_volume_data.json
+        run: python validators/validate_fluid_volume_data.py
+
+
+
