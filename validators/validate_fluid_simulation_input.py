@@ -2,6 +2,10 @@
 
 import os
 import sys
+
+# Add repository root to sys.path for local imports to work in GitHub Actions
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from jsonschema import validate as validate_schema, ValidationError
 
 from utils.data_loaders import load_json
@@ -30,7 +34,7 @@ def main():
     data_dir = os.path.join(workspace_dir, "data", "testing-input-output")
     schema_dir = os.path.join(workspace_dir, "schema")
 
-    # Load and validate each file against its schema
+    # File paths
     paths = {
         "fluid_simulation_input": os.path.join(data_dir, "fluid_simulation_input.json"),
         "initial_data": os.path.join(data_dir, "initial_data.json"),
@@ -43,6 +47,7 @@ def main():
         "mesh_data": os.path.join(schema_dir, "mesh_data.schema.json"),
     }
 
+    # Load files
     try:
         fluid_input = load_json(paths["fluid_simulation_input"])
         initial_data = load_json(paths["initial_data"])
@@ -51,12 +56,12 @@ def main():
         print(f"❌ Failed to load one or more JSON files: {e}")
         sys.exit(1)
 
-    # Schema validations
+    # Schema validation
     validate_with_schema(fluid_input, schemas["fluid_simulation_input"], "fluid_simulation_input.json")
     validate_with_schema(initial_data, schemas["initial_data"], "initial_data.json")
     validate_with_schema(mesh_data, schemas["mesh_data"], "mesh_data.json")
 
-    # Physics-level cross validations
+    # Physics-level validations
     required_keys = ["domain_bounds", "boundary_conditions", "inlet_velocity", "viscosity", "time_steps", "mesh_node_references"]
     assert_keys_present(fluid_input, required_keys, filename=paths["fluid_simulation_input"])
 
