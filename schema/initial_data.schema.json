@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Initial Data Schema for Fluid Simulation",
+  "type": "object",
+  "required": ["boundary_conditions", "fluid_properties", "simulation_parameters"],
+
+  "properties": {
+    "boundary_conditions": {
+      "type": "object",
+      "required": ["inlet", "outlet", "wall"],
+      "properties": {
+        "inlet": {
+          "type": "object",
+          "required": ["velocity", "pressure"],
+          "properties": {
+            "velocity": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Velocity vector [Ux, Uy, Uz] at the inlet (m/s)"
+            },
+            "pressure": {
+              "type": "number",
+              "description": "Absolute pressure value at the inlet (Pa)"
+            }
+          }
+        },
+        "outlet": {
+          "type": "object",
+          "required": ["pressure"],
+          "properties": {
+            "pressure": {
+              "type": "number",
+              "description": "Static pressure prescribed at the outlet (Pa)"
+            }
+          }
+        },
+        "wall": {
+          "type": "object",
+          "required": ["no_slip"],
+          "properties": {
+            "no_slip": {
+              "type": "boolean",
+              "description": "True if the wall uses a no-slip condition (zero velocity)"
+            }
+          }
+        }
+      }
+    },
+
+    "fluid_properties": {
+      "type": "object",
+      "required": ["density", "viscosity", "thermodynamics"],
+      "properties": {
+        "density": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Initial mass density of the fluid (kg/m³)"
+        },
+        "viscosity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Dynamic viscosity (Pa·s)"
+        },
+        "thermodynamics": {
+          "type": "object",
+          "required": ["model"],
+          "properties": {
+            "model": {
+              "type": "string",
+              "enum": ["ideal_gas", "incompressible", "custom", "tabulated"],
+              "description": "Thermodynamic model type for temperature and density calculation"
+            },
+            "specific_gas_constant_J_per_kgK": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Specific gas constant (J/kg·K), required for ideal gas model"
+            },
+            "adiabatic_index_gamma": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Ratio of Cp/Cv (dimensionless), e.g. 1.4 for air"
+            }
+          },
+          "dependentRequired": {
+            "ideal_gas": ["specific_gas_constant_J_per_kgK", "adiabatic_index_gamma"]
+          }
+        }
+      }
+    },
+
+    "simulation_parameters": {
+      "type": "object",
+      "required": ["time_step", "total_time", "solver"],
+      "properties": {
+        "time_step": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Time increment per iteration (s)"
+        },
+        "total_time": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Total simulated duration (s)"
+        },
+        "solver": {
+          "type": "string",
+          "enum": ["explicit", "implicit"],
+          "description": "Numerical method used"
+        }
+      }
+    }
+  },
+
+  "additionalProperties": false
+}
+
+
