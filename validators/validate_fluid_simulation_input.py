@@ -3,7 +3,6 @@
 import os
 import sys
 
-# Add repository root to sys.path for local imports to work in GitHub Actions
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from jsonschema import validate as validate_schema, ValidationError
@@ -20,8 +19,30 @@ def validate_with_schema(json_data, schema_path, label):
         print(f"❌ Schema validation failed for {label}:\n{ve.message}")
         sys.exit(1)
 
+def cross_validate_mesh_headers(fluid_mesh, mesh_data):
+    print("🔗 Cross-validating mesh headers...")
+
+    for key in ["nodes", "edges", "faces", "volumes"]:
+        sim_val = fluid_mesh.get(key)
+        raw_val = mesh_data.get(key)
+        if sim_val != raw_val:
+            raise ValueError(f"❌ Mismatch in mesh.{key}: fluid_input has {sim_val}, mesh_data has {raw_val}")
+    print("✅ Mesh headers match between files.")
+
+def validate_boundary_faces_exist(fluid_input, mesh_data):
+    print("🔗 Validating boundary face IDs against mesh_data...")
+
+    valid_ids = {face["face_id"] for face in mesh_data.get("boundary_faces", [])}
+    bc = fluid_input.get("boundary_conditions", {})
+    for region in ["inlet", "outlet", "wall"]:
+        region_faces = bc.get(region, {}).get("faces", [])
+        for face_id in region_faces:
+            if face_id not in valid_ids:
+                raise ValueError(f"❌ Face ID {face_id} in '{region}' not found in mesh boundary_faces.")
+    print("✅ All boundary face IDs match mesh_data.")
+
 def main():
-    print("🔍 Validating fluid_simulation_input.json + dependencies with schema checks only...")
+    print("🔍 Validating fluid_simulation_input.json + dependencies with schema and structural checks...")
 
     workspace_dir = os.getenv("GITHUB_WORKSPACE", ".")
     data_dir = os.path.join(workspace_dir, "data", "testing-input-output")
@@ -51,11 +72,16 @@ def main():
     validate_with_schema(initial_data, schemas["initial_data"], "initial_data.json")
     validate_with_schema(mesh_data, schemas["mesh_data"], "mesh_data.json")
 
+    # Cross-validation checks
+    cross_validate_mesh_headers(fluid_input.get("mesh", {}), mesh_data)
+    validate_boundary_faces_exist(fluid_input, mesh_data)
+
+    # Optional physics sanity check
     ic = initial_data.get("initial_conditions", {})
     if "temperature" in ic and ic["temperature"] <= 0:
         raise ValueError(f"🚫 Invalid temperature in {paths['initial_data']}: {ic['temperature']} K")
 
-    print("✅ All schema checks passed for fluid_simulation_input.json.")
+    print("✅ All schema and data consistency checks passed for fluid_simulation_input.json.")
 
 if __name__ == "__main__":
     try:
