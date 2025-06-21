@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Navier-Stokes Simulation Results Schema",
+  "description": "Schema for the output JSON file containing fluid simulation results.",
+  "type": "object",
+  "required": [
+    "time_points",
+    "velocity_history",
+    "pressure_history",
+    "mesh_info"
+  ],
+  "properties": {
+    "time_points": {
+      "type": "array",
+      "description": "A list of time points (floats) at which the simulation results were recorded.",
+      "items": {
+        "type": "number",
+        "format": "float",
+        "description": "Simulation time in seconds."
+      },
+      "minItems": 1
+    },
+    "velocity_history": {
+      "type": "array",
+      "description": "A list of velocity field snapshots over time. Each element corresponds to a time point in 'time_points'.",
+      "items": {
+        "type": "array",
+        "description": "A single snapshot of the velocity field for all nodes at a given time step. The array size is 'num_nodes'.",
+        "items": {
+          "type": "array",
+          "description": "The [x, y, z] velocity components (floats) for a single node.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "minItems": 1
+    },
+    "pressure_history": {
+      "type": "array",
+      "description": "A list of pressure field snapshots over time. Each element corresponds to a time point in 'time_points'.",
+      "items": {
+        "type": "array",
+        "description": "A single snapshot of the pressure field for all nodes at a given time step. The array size is 'num_nodes'.",
+        "items": {
+          "type": "number",
+          "format": "float",
+          "description": "Pressure value for a single node."
+        }
+      },
+      "minItems": 1
+    },
+    "mesh_info": {
+      "type": "object",
+      "description": "Contains static information about the simulation mesh.",
+      "required": [
+        "nodes",
+        "nodes_coords",
+        "grid_shape",
+        "dx",
+        "dy",
+        "dz"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The total number of nodes in the computational grid."
+        },
+        "nodes_coords": {
+          "type": "array",
+          "description": "A list of [x, y, z] coordinates (floats) for each node in the grid. The order corresponds to the 1D node index.",
+          "items": {
+            "type": "array",
+            "description": "The [x, y, z] coordinates for a single node.",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "grid_shape": {
+          "type": "array",
+          "description": "The 3D dimensions of the structured grid as [Nx, Ny, Nz] integers.",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "dx": {
+          "type": "number",
+          "format": "float",
+          "description": "The grid spacing in the x-direction. Can be non-positive if grid dimension is 1."
+        },
+        "dy": {
+          "type": "number",
+          "format": "float",
+          "description": "The grid spacing in the y-direction. Can be non-positive if grid dimension is 1."
+        },
+        "dz": {
+          "type": "number",
+          "format": "float",
+          "description": "The grid spacing in the z-direction. Can be non-positive if grid dimension is 1 (e.g., for 2D simulations where Nz=1)."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+
+
+
