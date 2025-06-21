@@ -4,6 +4,10 @@
   "type": "object",
   "required": ["nodes", "edges", "faces", "volumes", "boundary_faces"],
   "properties": {
+    "type": {
+      "type": "string",
+      "description": "Optional type label for the mesh (e.g. 'structured', 'unstructured')"
+    },
     "nodes": {
       "type": "integer",
       "minimum": 0,
