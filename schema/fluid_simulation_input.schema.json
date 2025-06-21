@@ -52,7 +52,8 @@
                     "type": "array",
                     "items": { "type": "number" },
                     "minItems": 3,
-                    "maxItems": 3
+                    "maxItems": 3,
+                    "description": "3D coordinates for a single node"
                   }
                 },
                 "minProperties": 1,
@@ -77,8 +78,8 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs designated as inlet surfaces"
+              "description": "Face IDs designated as inlet surfaces",
+              "minItems": 1
             },
             "velocity": {
               "type": "array",
@@ -91,7 +92,8 @@
               "type": "number",
               "description": "Absolute inlet pressure in Pascals"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "outlet": {
           "type": "object",
@@ -100,14 +102,15 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs designated as outlet boundaries"
+              "description": "Face IDs designated as outlet surfaces",
+              "minItems": 1
             },
             "pressure": {
               "type": "number",
               "description": "Static pressure applied at the outlet (Pa)"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "wall": {
           "type": "object",
@@ -116,14 +119,15 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs where wall condition is applied"
+              "description": "Face IDs designated as walls",
+              "minItems": 1
             },
             "no_slip": {
               "type": "boolean",
-              "description": "True for zero relative wall velocity"
+              "description": "If true, enforces a zero-velocity boundary"
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -154,23 +158,22 @@
         "time_step": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Time increment per simulation step (s)"
+          "description": "Simulation time step (s)"
         },
         "total_time": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Total simulation duration (s)"
+          "description": "Total simulation time (s)"
         },
         "solver": {
           "type": "string",
           "enum": ["explicit", "implicit"],
-          "description": "Numerical scheme used"
+          "description": "Time integration scheme used"
         }
       },
       "additionalProperties": false
     }
   },
-
   "additionalProperties": false
 }
 
