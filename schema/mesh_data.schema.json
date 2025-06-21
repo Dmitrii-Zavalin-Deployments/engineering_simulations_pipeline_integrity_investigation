@@ -33,11 +33,15 @@
       "description": "List of boundary faces with node geometry",
       "items": {
         "type": "object",
-        "required": ["face_id", "nodes"],
+        "required": ["face_id", "nodes", "type"],
         "properties": {
           "face_id": {
             "type": "integer",
             "description": "Identifier of the face"
+          },
+          "type": {
+            "type": "string",
+            "description": "Boundary condition type (e.g. 'inlet', 'outlet', 'wall')"
           },
           "nodes": {
             "type": "object",
@@ -61,3 +65,6 @@
   },
   "additionalProperties": false
 }
+
+
+
