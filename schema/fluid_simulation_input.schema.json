@@ -52,8 +52,7 @@
                     "type": "array",
                     "items": { "type": "number" },
                     "minItems": 3,
-                    "maxItems": 3,
-                    "description": "3D coordinates for a single node"
+                    "maxItems": 3
                   }
                 },
                 "minProperties": 1,
@@ -78,8 +77,8 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "description": "Face IDs designated as inlet surfaces",
-              "minItems": 1
+              "minItems": 1,
+              "description": "Face IDs designated as inlet surfaces"
             },
             "velocity": {
               "type": "array",
@@ -102,8 +101,8 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "description": "Face IDs designated as outlet surfaces",
-              "minItems": 1
+              "minItems": 1,
+              "description": "Face IDs designated as outlet boundaries"
             },
             "pressure": {
               "type": "number",
@@ -119,12 +118,12 @@
             "faces": {
               "type": "array",
               "items": { "type": "integer" },
-              "description": "Face IDs designated as walls",
-              "minItems": 1
+              "minItems": 1,
+              "description": "Face IDs where wall condition is applied"
             },
             "no_slip": {
               "type": "boolean",
-              "description": "If true, enforces a zero-velocity boundary"
+              "description": "True for zero relative wall velocity"
             }
           },
           "additionalProperties": false
@@ -148,7 +147,7 @@
           "description": "Dynamic viscosity (Pa·s)"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
 
     "simulation_parameters": {
@@ -163,12 +162,12 @@
         "total_time": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Total simulation time (s)"
+          "description": "Total simulation duration (s)"
         },
         "solver": {
           "type": "string",
           "enum": ["explicit", "implicit"],
-          "description": "Time integration scheme used"
+          "description": "Numerical integration scheme"
         }
       },
       "additionalProperties": false
@@ -176,6 +175,5 @@
   },
   "additionalProperties": false
 }
-
 
 
