@@ -2,6 +2,7 @@
 
 import os
 import sys
+import glob
 from jsonschema import validate as validate_schema, ValidationError
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -99,12 +100,46 @@ def check_grid_spacing(results):
     print(f"✅ Grid shape: {shape}, spacing: dx={info['dx']}, dy={info['dy']}, dz={info['dz']}")
 
 
+def validate_output_field_snapshots(output_dir, schema_dir):
+    print("🧪 Validating navier_stokes_output config, mesh, and step snapshots...")
+
+    config_path = os.path.join(output_dir, "config.json")
+    mesh_path = os.path.join(output_dir, "mesh.json")
+    step_files = sorted(glob.glob(os.path.join(output_dir, "fields", "step_*.json")))
+
+    schema_config = os.path.join(schema_dir, "navier_stokes_config.schema.json")
+    schema_mesh = os.path.join(schema_dir, "navier_stokes_mesh.schema.json")
+    schema_step = os.path.join(schema_dir, "navier_stokes_step.schema.json")
+
+    try:
+        config = load_json(config_path)
+        validate_with_schema(config, schema_config, "config.json")
+
+        mesh = load_json(mesh_path)
+        validate_with_schema(mesh, schema_mesh, "mesh.json")
+    except Exception as e:
+        print(f"❌ Failed to validate config or mesh: {e}")
+        sys.exit(1)
+
+    for step_file in step_files:
+        try:
+            snapshot = load_json(step_file)
+            label = os.path.basename(step_file)
+            validate_with_schema(snapshot, schema_step, label)
+        except Exception as e:
+            print(f"❌ Error in {step_file}: {e}")
+            sys.exit(1)
+
+    print(f"✅ Validated {len(step_files)} timestep snapshot(s) successfully.")
+
+
 def main():
     print("🔍 Validating navier_stokes_results.json with input mesh and boundary expectations...")
 
     workspace = os.getenv("GITHUB_WORKSPACE", ".")
     data_dir = os.path.join(workspace, "data", "testing-input-output")
     schema_dir = os.path.join(workspace, "schema")
+    output_dir = os.path.join(data_dir, "navier_stokes_output")
 
     paths = {
         "results": os.path.join(data_dir, "navier_stokes_results.json"),
@@ -123,17 +158,21 @@ def main():
         print(f"❌ Failed to load JSON files: {e}")
         sys.exit(1)
 
-    # Schema checks
+    # Schema validation
     validate_with_schema(results, schemas["results"], "navier_stokes_results.json")
     validate_with_schema(input_data, schemas["input"], "fluid_simulation_input.json")
 
-    # Structural consistency
+    # Structural checks
     check_node_count_and_coords(results["mesh_info"], input_data["mesh"])
     check_history_shapes(results)
     cross_validate_node_coordinates(results, input_data)
     check_grid_spacing(results)
 
+    # Output snapshot validation
+    validate_output_field_snapshots(output_dir, schema_dir)
+
     print("✅ All output validation checks passed with high precision.")
+
 
 if __name__ == "__main__":
     try:

@@ -37,8 +37,11 @@ jobs:
       # - name: ✅ Validate fluid_simulation_input.json
       #   run: python validators/validate_fluid_simulation_input.py
 
-      - name: ✅ Validate navier_stokes_results.json
-        run: python validators/validate_navier_stokes_results.py
+      - name: 🔓 Make navier_stokes validation script executable
+        run: chmod +x validators/validate_navier_stokes_results.sh
+
+      - name: ✅ Validate navier_stokes_results using shell script
+        run: validators/validate_navier_stokes_results.sh
 
       # - name: ✅ Validate field history and grid metadata
       #   run: python validators/validate_field_history_and_grid.py
