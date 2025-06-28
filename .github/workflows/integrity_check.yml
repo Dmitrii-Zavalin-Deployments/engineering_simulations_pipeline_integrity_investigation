@@ -34,6 +34,9 @@ jobs:
           REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         run: src/download_from_dropbox.sh
 
+      - name: 📁 List full repository structure (recursive)
+        run: ls -R
+
       # - name: ✅ Validate fluid_simulation_input.json
       #   run: python validators/validate_fluid_simulation_input.py
 
