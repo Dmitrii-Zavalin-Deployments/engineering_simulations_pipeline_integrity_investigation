@@ -9,8 +9,12 @@ DEST_DIR="."
 echo "📦 Unzipping ${ZIP_PATH} to ${DEST_DIR}..."
 unzip -o "$ZIP_PATH" -d "$DEST_DIR"
 
-echo "🚀 Running validate_fluid_simulation_input.py..."
-python3 validators/validate_fluid_simulation_input.py
+# Skip this step if initial_data.json is not needed or missing
+# echo "🚀 Running validate_fluid_simulation_input.py..."
+# python3 validators/validate_fluid_simulation_input.py
+
+echo "🚀 Running validate_navier_stokes_results.py..."
+python3 validators/validate_navier_stokes_results.py
 
 echo "✅ Validation completed successfully."
 

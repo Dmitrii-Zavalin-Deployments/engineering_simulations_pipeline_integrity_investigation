@@ -1,5 +1,3 @@
-# validators/validate_navier_stokes_results.py
-
 import os
 import sys
 import glob
@@ -158,17 +156,14 @@ def main():
         print(f"❌ Failed to load JSON files: {e}")
         sys.exit(1)
 
-    # Schema validation
     validate_with_schema(results, schemas["results"], "navier_stokes_results.json")
     validate_with_schema(input_data, schemas["input"], "fluid_simulation_input.json")
 
-    # Structural checks
     check_node_count_and_coords(results["mesh_info"], input_data["mesh"])
     check_history_shapes(results)
     cross_validate_node_coordinates(results, input_data)
     check_grid_spacing(results)
 
-    # Output snapshot validation
     validate_output_field_snapshots(output_dir, schema_dir)
 
     print("✅ All output validation checks passed with high precision.")
