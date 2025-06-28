@@ -2,132 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Fluid Simulation Input Schema",
   "type": "object",
-  "required": ["mesh", "boundary_conditions", "fluid_properties", "simulation_parameters"],
+  "required": [
+    "domain_definition",
+    "fluid_properties",
+    "initial_conditions",
+    "simulation_parameters",
+    "boundary_conditions",
+    "mesh"
+  ],
   "properties": {
-    "mesh": {
+    "domain_definition": {
       "type": "object",
-      "required": ["nodes", "edges", "faces", "volumes", "boundary_faces"],
+      "required": ["min_x", "max_x", "min_y", "max_y", "min_z", "max_z", "nx", "ny", "nz"],
       "properties": {
-        "nodes": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Total number of mesh nodes"
-        },
-        "edges": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Total number of edges in the mesh"
-        },
-        "faces": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Total number of mesh faces"
-        },
-        "volumes": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Total number of mesh volumes"
-        },
-        "boundary_faces": {
-          "type": "array",
-          "description": "List of boundary faces and their geometry",
-          "items": {
-            "type": "object",
-            "required": ["face_id", "type", "nodes"],
-            "properties": {
-              "face_id": {
-                "type": "integer",
-                "description": "Unique identifier for the boundary face"
-              },
-              "type": {
-                "type": "string",
-                "enum": ["inlet", "outlet", "wall"],
-                "description": "Physical boundary type of this face"
-              },
-              "nodes": {
-                "type": "object",
-                "description": "Map of node IDs to 3D coordinates",
-                "patternProperties": {
-                  "^[0-9]+$": {
-                    "type": "array",
-                    "items": { "type": "number" },
-                    "minItems": 3,
-                    "maxItems": 3
-                  }
-                },
-                "minProperties": 1,
-                "additionalProperties": false
-              }
-            },
-            "additionalProperties": false
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-
-    "boundary_conditions": {
-      "type": "object",
-      "required": ["inlet", "outlet", "wall"],
-      "properties": {
-        "inlet": {
-          "type": "object",
-          "required": ["faces", "velocity", "pressure"],
-          "properties": {
-            "faces": {
-              "type": "array",
-              "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs designated as inlet surfaces"
-            },
-            "velocity": {
-              "type": "array",
-              "items": { "type": "number" },
-              "minItems": 3,
-              "maxItems": 3,
-              "description": "Velocity vector [Ux, Uy, Uz] at inlet (m/s)"
-            },
-            "pressure": {
-              "type": "number",
-              "description": "Absolute inlet pressure in Pascals"
-            }
-          },
-          "additionalProperties": false
-        },
-        "outlet": {
-          "type": "object",
-          "required": ["faces", "pressure"],
-          "properties": {
-            "faces": {
-              "type": "array",
-              "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs designated as outlet boundaries"
-            },
-            "pressure": {
-              "type": "number",
-              "description": "Static pressure applied at the outlet (Pa)"
-            }
-          },
-          "additionalProperties": false
-        },
-        "wall": {
-          "type": "object",
-          "required": ["faces", "no_slip"],
-          "properties": {
-            "faces": {
-              "type": "array",
-              "items": { "type": "integer" },
-              "minItems": 1,
-              "description": "Face IDs where wall condition is applied"
-            },
-            "no_slip": {
-              "type": "boolean",
-              "description": "True for zero relative wall velocity"
-            }
-          },
-          "additionalProperties": false
-        }
+        "min_x": { "type": "number" },
+        "max_x": { "type": "number" },
+        "min_y": { "type": "number" },
+        "max_y": { "type": "number" },
+        "min_z": { "type": "number" },
+        "max_z": { "type": "number" },
+        "nx": { "type": "integer", "minimum": 1 },
+        "ny": { "type": "integer", "minimum": 1 },
+        "nz": { "type": "integer", "minimum": 1 }
       },
       "additionalProperties": false
     },
@@ -138,16 +34,31 @@
       "properties": {
         "density": {
           "type": "number",
-          "exclusiveMinimum": 0,
-          "description": "Fluid density (kg/m³)"
+          "exclusiveMinimum": 0
         },
         "viscosity": {
           "type": "number",
-          "exclusiveMinimum": 0,
-          "description": "Dynamic viscosity (Pa·s)"
+          "exclusiveMinimum": 0
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
+    },
+
+    "initial_conditions": {
+      "type": "object",
+      "required": ["initial_velocity", "initial_pressure"],
+      "properties": {
+        "initial_velocity": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "initial_pressure": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
     },
 
     "simulation_parameters": {
@@ -156,18 +67,93 @@
       "properties": {
         "time_step": {
           "type": "number",
-          "exclusiveMinimum": 0,
-          "description": "Simulation time step (s)"
+          "exclusiveMinimum": 0
         },
         "total_time": {
           "type": "number",
-          "exclusiveMinimum": 0,
-          "description": "Total simulation duration (s)"
+          "exclusiveMinimum": 0
         },
         "solver": {
           "type": "string",
-          "enum": ["explicit", "implicit"],
-          "description": "Numerical integration scheme"
+          "enum": ["explicit", "implicit"]
+        },
+        "output_frequency_steps": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "boundary_conditions": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "required": ["faces", "type", "apply_to"],
+          "properties": {
+            "faces": {
+              "type": "array",
+              "items": { "type": "integer" },
+              "minItems": 1
+            },
+            "type": {
+              "type": "string"
+            },
+            "apply_to": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["velocity", "pressure"]
+              },
+              "minItems": 1
+            },
+            "velocity": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "pressure": {
+              "type": "number"
+            },
+            "no_slip": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "mesh": {
+      "type": "object",
+      "required": ["boundary_faces"],
+      "properties": {
+        "boundary_faces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["face_id", "nodes"],
+            "properties": {
+              "face_id": { "type": "integer" },
+              "nodes": {
+                "type": "object",
+                "patternProperties": {
+                  "^n[0-9]+$": {
+                    "type": "array",
+                    "items": { "type": "number" },
+                    "minItems": 3,
+                    "maxItems": 3
+                  }
+                },
+                "minProperties": 3,
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
@@ -175,5 +161,3 @@
   },
   "additionalProperties": false
 }
-
-
