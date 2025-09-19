@@ -43,6 +43,9 @@ jobs:
       - name: 🔓 Make navier_stokes validation script executable
         run: chmod +x validators/validate_navier_stokes_results.sh
 
+      - name: 🧭 Show PYTHONPATH
+        run: echo $PYTHONPATH
+
       - name: ✅ Validate navier_stokes_results using shell script
         run: validators/validate_navier_stokes_results.sh
 
@@ -60,7 +63,6 @@ jobs:
 
       - name: Run validation tests
         run: pytest tests/
-
 
 
 

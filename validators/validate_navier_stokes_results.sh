@@ -28,6 +28,9 @@ for log_file in "${LOG_FILES[@]}"; do
   fi
 done
 
+# Set Python module path
+export PYTHONPATH=$(pwd)
+
 # Run Python validator
 echo "🚀 Running validate_navier_stokes_results.py..."
 python3 validators/validate_navier_stokes_results.py

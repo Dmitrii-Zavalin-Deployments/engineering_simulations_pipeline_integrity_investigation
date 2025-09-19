@@ -4,7 +4,12 @@ import os
 import sys
 import glob
 
-from utils import validate_json  # Modular import from utils/__init__.py
+# Fallback import block for environments without PYTHONPATH
+try:
+    from utils import validate_json
+except ModuleNotFoundError:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    from utils import validate_json
 
 def validate_navier_stokes_output(output_dir, schema_dir):
     print("🧪 Validating navier_stokes_output step snapshots and logs...")
