@@ -49,17 +49,8 @@ jobs:
       - name: ✅ Validate navier_stokes_results using shell script
         run: validators/validate_navier_stokes_results.sh
 
-      # - name: ✅ Validate field history and grid metadata
-      #   run: python validators/validate_field_history_and_grid.py
-
-      # - name: ✅ Validate fluid_particles.npy
-      #   run: python validators/validate_fluid_particles.py
-
-      # - name: ✅ Validate fluid_mesh_data.json
-      #   run: python validators/validate_fluid_mesh_data.py
-
-      # - name: ✅ Validate fluid_volume_data.json
-      #   run: python validators/validate_fluid_volume_data.py
+      - name: ✅ Validate influence_flags_log.json
+        run: python validators/validate_influence_flags_log.py
 
       - name: Run validation tests
         run: pytest tests/
