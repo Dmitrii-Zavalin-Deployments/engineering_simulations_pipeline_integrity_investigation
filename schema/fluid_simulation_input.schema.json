@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Fluid Simulation Input Schema",
+  "$id": "https://example.com/fluid_simulation_input.schema.json",
+  "title": "Fluid Simulation Input",
   "type": "object",
   "required": [
     "domain_definition",
@@ -8,7 +9,7 @@
     "initial_conditions",
     "simulation_parameters",
     "boundary_conditions",
-    "mesh"
+    "geometry_definition"
   ],
   "properties": {
     "domain_definition": {
@@ -27,23 +28,15 @@
       },
       "additionalProperties": false
     },
-
     "fluid_properties": {
       "type": "object",
       "required": ["density", "viscosity"],
       "properties": {
-        "density": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "viscosity": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        }
+        "density": { "type": "number" },
+        "viscosity": { "type": "number" }
       },
       "additionalProperties": false
     },
-
     "initial_conditions": {
       "type": "object",
       "required": ["initial_velocity", "initial_pressure"],
@@ -54,106 +47,100 @@
           "minItems": 3,
           "maxItems": 3
         },
-        "initial_pressure": {
-          "type": "number"
-        }
+        "initial_pressure": { "type": "number" }
       },
       "additionalProperties": false
     },
-
     "simulation_parameters": {
       "type": "object",
-      "required": ["time_step", "total_time", "solver"],
+      "required": ["time_step", "total_time", "output_interval"],
       "properties": {
-        "time_step": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "total_time": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "solver": {
-          "type": "string",
-          "enum": ["explicit", "implicit"]
-        },
-        "output_frequency_steps": {
-          "type": "integer",
-          "minimum": 1
-        }
+        "time_step": { "type": "number" },
+        "total_time": { "type": "number" },
+        "output_interval": { "type": "integer", "minimum": 1 }
       },
       "additionalProperties": false
     },
-
     "boundary_conditions": {
       "type": "object",
-      "patternProperties": {
-        "^.*$": {
-          "type": "object",
-          "required": ["faces", "type", "apply_to"],
-          "properties": {
-            "faces": {
-              "type": "array",
-              "items": { "type": "integer" },
-              "minItems": 1
-            },
-            "type": {
-              "type": "string"
-            },
-            "apply_to": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": ["velocity", "pressure"]
-              },
-              "minItems": 1
-            },
-            "velocity": {
-              "type": "array",
-              "items": { "type": "number" },
-              "minItems": 3,
-              "maxItems": 3
-            },
-            "pressure": {
-              "type": "number"
-            },
-            "no_slip": {
-              "type": "boolean"
-            }
-          },
-          "additionalProperties": false
-        }
+      "required": [
+        "x_min", "x_max", "y_min", "y_max", "z_min", "z_max",
+        "faces", "type", "apply_faces", "apply_to",
+        "pressure", "velocity", "no_slip"
+      ],
+      "properties": {
+        "x_min": { "type": "string" },
+        "x_max": { "type": "string" },
+        "y_min": { "type": "string" },
+        "y_max": { "type": "string" },
+        "z_min": { "type": "string" },
+        "z_max": { "type": "string" },
+        "faces": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "type": {
+          "type": "string",
+          "enum": ["dirichlet", "neumann", "robin"]
+        },
+        "apply_faces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["x_min", "x_max", "y_min", "y_max", "z_min", "z_max"]
+          }
+        },
+        "apply_to": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["velocity", "pressure"]
+          }
+        },
+        "pressure": { "type": "number" },
+        "velocity": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "no_slip": { "type": "boolean" }
       },
       "additionalProperties": false
     },
-
-    "mesh": {
+    "geometry_definition": {
       "type": "object",
-      "required": ["boundary_faces"],
+      "required": ["geometry_mask_flat", "geometry_mask_shape", "mask_encoding", "flattening_order"],
       "properties": {
-        "boundary_faces": {
+        "geometry_mask_flat": {
           "type": "array",
           "items": {
-            "type": "object",
-            "required": ["face_id", "nodes"],
-            "properties": {
-              "face_id": { "type": "integer" },
-              "nodes": {
-                "type": "object",
-                "patternProperties": {
-                  "^n[0-9]+$": {
-                    "type": "array",
-                    "items": { "type": "number" },
-                    "minItems": 3,
-                    "maxItems": 3
-                  }
-                },
-                "minProperties": 3,
-                "additionalProperties": false
-              }
-            },
-            "additionalProperties": false
-          }
+            "type": "integer",
+            "enum": [0, 1]
+          },
+          "minItems": 1
+        },
+        "geometry_mask_shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "mask_encoding": {
+          "type": "object",
+          "required": ["fluid", "solid"],
+          "properties": {
+            "fluid": { "type": "integer", "enum": [1] },
+            "solid": { "type": "integer", "enum": [0] }
+          },
+          "additionalProperties": false
+        },
+        "flattening_order": {
+          "type": "string",
+          "enum": ["x-major", "y-major", "z-major"]
         }
       },
       "additionalProperties": false
@@ -161,3 +148,6 @@
   },
   "additionalProperties": false
 }
+
+
+
