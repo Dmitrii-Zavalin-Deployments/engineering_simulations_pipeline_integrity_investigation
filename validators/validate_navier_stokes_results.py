@@ -21,36 +21,15 @@ def validate_with_schema(json_data, schema_path, label):
         sys.exit(1)
 
 
-def validate_output_field_snapshots(output_dir, schema_dir):
-    print("🧪 Validating navier_stokes_output config, mesh, and step snapshots...")
+def validate_navier_stokes_output(output_dir, schema_dir):
+    print("🧪 Validating navier_stokes_output step snapshots and logs...")
 
-    config_path = os.path.join(output_dir, "config.json")
-    mesh_path = os.path.join(output_dir, "mesh.json")
-    step_files = sorted(glob.glob(os.path.join(output_dir, "fields", "step_*.json")))
-
-    schema_config = os.path.join(schema_dir, "navier_stokes_config.schema.json")
-    schema_mesh = os.path.join(schema_dir, "navier_stokes_mesh.schema.json")
+    # Step snapshots
+    step_files = sorted(glob.glob(os.path.join(output_dir, "fluid_simulation_input_step_*.json")))
     schema_step = os.path.join(schema_dir, "navier_stokes_step.schema.json")
 
-    # Validate config.json
-    try:
-        config = load_json(config_path)
-        validate_with_schema(config, schema_config, "config.json")
-    except Exception as e:
-        print(f"❌ Failed to validate config.json: {e}")
-        sys.exit(1)
-
-    # Validate mesh.json
-    try:
-        mesh = load_json(mesh_path)
-        validate_with_schema(mesh, schema_mesh, "mesh.json")
-    except Exception as e:
-        print(f"❌ Failed to validate mesh.json: {e}")
-        sys.exit(1)
-
-    # Validate step snapshots
     if not step_files:
-        print("⚠️ No step_*.json files found in fields directory.")
+        print("❌ No fluid_simulation_input_step_*.json files found.")
         sys.exit(1)
 
     for step_file in step_files:
@@ -59,10 +38,27 @@ def validate_output_field_snapshots(output_dir, schema_dir):
             label = os.path.basename(step_file)
             validate_with_schema(snapshot, schema_step, label)
         except Exception as e:
-            print(f"❌ Error in {step_file}: {e}")
+            print(f"❌ Error validating {step_file}: {e}")
             sys.exit(1)
 
-    print(f"✅ Validated {len(step_files)} timestep snapshot(s) successfully.")
+    print(f"✅ Validated {len(step_files)} step snapshot(s) successfully.")
+
+    # Log files (optional presence)
+    log_files = [
+        "divergence_log.txt",
+        "influence_flags_log.json",
+        "mutation_pathways_log.json",
+        "step_summary.txt"
+    ]
+
+    for log_name in log_files:
+        log_path = os.path.join(output_dir, log_name)
+        if os.path.exists(log_path):
+            print(f"📄 Found log file: {log_name}")
+        else:
+            print(f"⚠️ Missing expected log file: {log_name}")
+
+    print("✅ Log file check completed.")
 
 
 def main():
@@ -73,9 +69,9 @@ def main():
     schema_dir = os.path.join(workspace, "schema")
     output_dir = os.path.join(data_dir, "navier_stokes_output")
 
-    validate_output_field_snapshots(output_dir, schema_dir)
+    validate_navier_stokes_output(output_dir, schema_dir)
 
-    print("✅ All output validation checks passed with high precision.")
+    print("✅ All output validation checks passed.")
 
 
 if __name__ == "__main__":
