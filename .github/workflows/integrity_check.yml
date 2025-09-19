@@ -55,6 +55,9 @@ jobs:
       - name: ✅ Validate influence_flags_log.json
         run: python validators/validate_influence_flags_log.py
 
+      - name: ✅ Validate mutation_pathways_log.json
+        run: python validators/validate_mutation_pathways_log.py
+
       - name: Run validation tests
         run: pytest tests/
 
