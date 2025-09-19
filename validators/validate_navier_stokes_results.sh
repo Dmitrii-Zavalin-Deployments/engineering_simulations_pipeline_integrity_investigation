@@ -1,22 +1,36 @@
 #!/bin/bash
+set -euo pipefail
 
-# Validate Navier–Stokes simulation results
-set -e
+echo "📦 Unzipping navier_stokes_output.zip to data/testing-input-output/navier_stokes_output/"
+unzip -o data/testing-input-output/navier_stokes_output.zip -d data/testing-input-output/navier_stokes_output/
 
-ZIP_PATH="data/testing-input-output/navier_stokes_output.zip"
-DEST_DIR="."
+OUTPUT_DIR="data/testing-input-output/navier_stokes_output"
+STEP_PATTERN="fluid_simulation_input_step_*.json"
+LOG_FILES=("divergence_log.txt" "influence_flags_log.json" "mutation_pathways_log.json" "step_summary.txt")
 
-echo "📦 Unzipping ${ZIP_PATH} to ${DEST_DIR}..."
-unzip -o "$ZIP_PATH" -d "$DEST_DIR"
+# Pre-check: Ensure step files exist
+echo "🔍 Checking for step snapshot files..."
+STEP_COUNT=$(ls "$OUTPUT_DIR"/$STEP_PATTERN 2>/dev/null | wc -l)
+if [ "$STEP_COUNT" -eq 0 ]; then
+  echo "❌ No step snapshot files found in $OUTPUT_DIR. Validation aborted."
+  exit 1
+else
+  echo "✅ Found $STEP_COUNT step snapshot file(s)."
+fi
 
-# Skip this step if initial_data.json is not needed or missing
-# echo "🚀 Running validate_fluid_simulation_input.py..."
-# python3 validators/validate_fluid_simulation_input.py
+# Pre-check: Log file presence
+echo "📄 Checking for expected log files..."
+for log_file in "${LOG_FILES[@]}"; do
+  if [ -f "$OUTPUT_DIR/$log_file" ]; then
+    echo "✅ Found log file: $log_file"
+  else
+    echo "⚠️ Missing log file: $log_file"
+  fi
+done
 
+# Run Python validator
 echo "🚀 Running validate_navier_stokes_results.py..."
 python3 validators/validate_navier_stokes_results.py
-
-echo "✅ Validation completed successfully."
 
 
 

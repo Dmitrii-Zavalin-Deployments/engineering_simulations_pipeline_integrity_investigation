@@ -3,23 +3,8 @@
 import os
 import sys
 import glob
-from jsonschema import validate as validate_schema, ValidationError
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from utils.data_loaders import load_json
-
-
-def validate_with_schema(json_data, schema_path, label):
-    if not os.path.exists(schema_path):
-        print(f"⚠️ Schema file not found for {label}: {schema_path}")
-        return
-    try:
-        schema = load_json(schema_path)
-        validate_schema(instance=json_data, schema=schema)
-    except ValidationError as ve:
-        print(f"❌ Schema validation failed for {label}:\n{ve.message}")
-        sys.exit(1)
-
+from utils import validate_json  # Modular import from utils/__init__.py
 
 def validate_navier_stokes_output(output_dir, schema_dir):
     print("🧪 Validating navier_stokes_output step snapshots and logs...")
@@ -34,9 +19,8 @@ def validate_navier_stokes_output(output_dir, schema_dir):
 
     for step_file in step_files:
         try:
-            snapshot = load_json(step_file)
             label = os.path.basename(step_file)
-            validate_with_schema(snapshot, schema_step, label)
+            validate_json(step_file, schema_step, label=label)
         except Exception as e:
             print(f"❌ Error validating {step_file}: {e}")
             sys.exit(1)
@@ -60,7 +44,6 @@ def validate_navier_stokes_output(output_dir, schema_dir):
 
     print("✅ Log file check completed.")
 
-
 def main():
     print("🔍 Validating extracted contents of navier_stokes_output/")
 
@@ -72,7 +55,6 @@ def main():
     validate_navier_stokes_output(output_dir, schema_dir)
 
     print("✅ All output validation checks passed.")
-
 
 if __name__ == "__main__":
     try:

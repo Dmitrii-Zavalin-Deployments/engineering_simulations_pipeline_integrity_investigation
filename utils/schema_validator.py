@@ -1,8 +1,7 @@
-# utils/data_loaders.py
+# utils/schema_validator.py
 
-import json
-import numpy as np
 import os
+import json
 from jsonschema import validate as validate_schema, ValidationError
 
 def load_json(path):
@@ -18,37 +17,32 @@ def load_json(path):
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON in file {path}: {e.msg} at line {e.lineno}, column {e.colno}")
 
-def load_npy(path, allow_pickle=False):
-    """
-    Loads a NumPy array from .npy file.
-    """
-    if not os.path.isfile(path):
-        raise FileNotFoundError(f"NumPy file not found: {path}")
-    try:
-        return np.load(path, allow_pickle=allow_pickle)
-    except Exception as e:
-        raise ValueError(f"Failed to load .npy file {path}: {str(e)}")
-
-def validate_json(file_path, schema_path, label=None):
+def validate_json(file_path, schema_path, label=None, verbose=True):
     """
     Validates a JSON file against a given schema.
-    Raises ValidationError if the structure does not match.
+    Raises ValueError if validation fails.
+    
+    Parameters:
+    - file_path: Path to the JSON file to validate
+    - schema_path: Path to the JSON schema file
+    - label: Optional label for logging
+    - verbose: If True, prints validation status
     """
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"JSON file not found: {file_path}")
     if not os.path.isfile(schema_path):
         raise FileNotFoundError(f"Schema file not found: {schema_path}")
 
+    data = load_json(file_path)
+    schema = load_json(schema_path)
+
     try:
-        data = load_json(file_path)
-        schema = load_json(schema_path)
         validate_schema(instance=data, schema=schema)
-        if label:
-            print(f"✅ {label} passed schema validation.")
+        if verbose:
+            print(f"✅ {label or os.path.basename(file_path)} passed schema validation.")
         return True
     except ValidationError as ve:
-        error_label = label or os.path.basename(file_path)
-        raise ValueError(f"❌ {error_label} failed schema validation: {ve.message}")
+        raise ValueError(f"❌ {label or os.path.basename(file_path)} failed schema validation: {ve.message}")
 
 
 
