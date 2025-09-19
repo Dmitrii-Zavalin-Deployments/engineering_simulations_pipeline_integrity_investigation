@@ -58,6 +58,9 @@ jobs:
       - name: ✅ Validate flow_data.json
         run: python validators/validate_flow_data.py
 
+      - name: ✅ Validate boundary_conditions_gmsh.json
+        run: python validators/validate_boundary_conditions_gmsh.py
+
       - name: Run validation tests
         run: pytest tests/
 
