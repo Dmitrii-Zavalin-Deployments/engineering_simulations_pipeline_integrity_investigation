@@ -3,43 +3,94 @@
   "$id": "https://example.com/navier_stokes_step.schema.json",
   "title": "Navier-Stokes Simulation Step Snapshot",
   "type": "object",
-  "required": ["step", "velocity", "pressure"],
+  "required": ["step_index", "grid"],
   "properties": {
-    "step": {
+    "step_index": {
       "type": "integer",
-      "description": "Simulation timestep identifier"
+      "minimum": 0,
+      "description": "Simulation timestep index"
     },
-    "velocity": {
+    "grid": {
       "type": "array",
-      "description": "4D vector field array representing [Ux, Uy, Uz] vectors at each spatial cell",
+      "description": "List of spatial cells with fluid properties",
       "items": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "array",
-            "prefixItems": [
-              { "type": "number" },
-              { "type": "number" },
-              { "type": "number" }
-            ],
+        "type": "object",
+        "required": ["x", "y", "z", "fluid_mask"],
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "z": { "type": "number" },
+          "fluid_mask": { "type": "boolean" },
+          "velocity": {
+            "type": ["array", "null"],
+            "items": { "type": "number" },
             "minItems": 3,
             "maxItems": 3
+          },
+          "pressure": {
+            "type": ["number", "null"]
           }
-        }
+        },
+        "additionalProperties": false
       }
     },
-    "pressure": {
+    "pressure_mutated": { "type": "boolean" },
+    "velocity_projected": { "type": "boolean" },
+    "max_velocity": { "type": "number" },
+    "max_divergence": { "type": "number" },
+    "global_cfl": { "type": "number" },
+    "overflow_detected": { "type": "boolean" },
+    "damping_enabled": { "type": "boolean" },
+    "adjusted_time_step": { "type": "number" },
+    "projection_passes": { "type": "integer" },
+    "divergence_zero": { "type": "boolean" },
+    "projection_skipped": { "type": "boolean" },
+    "ghost_influence_count": { "type": "integer" },
+    "fluid_cells_modified_by_ghost": { "type": "integer" },
+    "triggered_by": {
       "type": "array",
-      "description": "3D scalar field array representing pressure at each spatial cell",
-      "items": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "items": { "type": "number" }
-        }
-      }
-    }
+      "items": { "type": "string" }
+    },
+    "pressure_solver_invoked": { "type": "boolean" },
+    "post_projection_divergence": { "type": "number" },
+    "ghost_registry": {
+      "type": "object",
+      "description": "Registry of ghost cell metadata",
+      "additionalProperties": true
+    },
+    "boundary_condition_applied": { "type": "boolean" },
+    "adaptive_timestep": { "type": "number" },
+    "pressure_mutation_count": { "type": "integer" },
+    "pressure_solver_passes": { "type": "integer" },
+    "mutated_cells": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ghost_diagnostics": {
+      "type": "object",
+      "required": [
+        "total",
+        "per_face",
+        "pressure_overrides",
+        "no_slip_enforced",
+        "fluid_cells_adjacent_to_ghosts"
+      ],
+      "properties": {
+        "total": { "type": "integer" },
+        "per_face": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" }
+        },
+        "pressure_overrides": { "type": "integer" },
+        "no_slip_enforced": { "type": "integer" },
+        "fluid_cells_adjacent_to_ghosts": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "reflex_score": { "type": "number" }
   },
   "additionalProperties": false
 }
+
+
+
