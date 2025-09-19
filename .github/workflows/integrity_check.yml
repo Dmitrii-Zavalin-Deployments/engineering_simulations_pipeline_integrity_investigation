@@ -43,6 +43,9 @@ jobs:
       - name: 🔓 Make navier_stokes validation script executable
         run: chmod +x validators/validate_navier_stokes_results.sh
 
+      - name: 🧭 Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
       - name: 🧭 Show PYTHONPATH
         run: echo $PYTHONPATH
 

@@ -31,9 +31,12 @@ done
 # Set Python module path
 export PYTHONPATH=$(pwd)
 
-# Run Python validator
+# Run Python validators
 echo "🚀 Running validate_navier_stokes_results.py..."
 python3 validators/validate_navier_stokes_results.py
+
+echo "🚀 Running validate_influence_flags_log.py..."
+python3 validators/validate_influence_flags_log.py
 
 
 

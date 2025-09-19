@@ -1,7 +1,13 @@
 # validators/validate_influence_flags_log.py
 
 import os
-from utils import validate_json
+import sys
+
+try:
+    from utils import validate_json
+except ModuleNotFoundError:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    from utils import validate_json
 
 def validate_influence_flags_log(output_dir, schema_dir):
     log_path = os.path.join(output_dir, "influence_flags_log.json")
