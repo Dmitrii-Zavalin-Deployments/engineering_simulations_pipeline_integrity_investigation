@@ -40,6 +40,9 @@ jobs:
       # - name: ✅ Validate fluid_simulation_input.json
       #   run: python validators/validate_fluid_simulation_input.py
 
+      - name: ✅ Validate flow_data.json
+        run: python validators/validate_flow_data.py
+
       - name: 🔓 Make navier_stokes validation script executable
         run: chmod +x validators/validate_navier_stokes_results.sh
 
