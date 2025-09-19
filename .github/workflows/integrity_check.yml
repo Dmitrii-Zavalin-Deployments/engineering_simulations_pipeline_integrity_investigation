@@ -61,6 +61,9 @@ jobs:
       - name: ✅ Validate boundary_conditions_gmsh.json
         run: python validators/validate_boundary_conditions_gmsh.py
 
+      - name: ✅ Validate geometry_masking_gmsh.json
+        run: python validators/validate_geometry_masking_gmsh.py
+
       - name: Run validation tests
         run: pytest tests/
 
