@@ -38,5 +38,8 @@ python3 validators/validate_navier_stokes_results.py
 echo "🚀 Running validate_influence_flags_log.py..."
 python3 validators/validate_influence_flags_log.py
 
+echo "🚀 Running validate_mutation_pathways_log.py..."
+python3 validators/validate_mutation_pathways_log.py
+
 
 
