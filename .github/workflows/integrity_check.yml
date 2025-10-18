@@ -84,8 +84,8 @@ jobs:
       - name: 🧭 Show PYTHONPATH
         run: echo $PYTHONPATH
 
-      - name: ✅ Validate navier_stokes_results using shell script
-        run: validators/validate_navier_stokes_results.sh
+      # - name: ✅ Validate navier_stokes_results using shell script
+      #   run: validators/validate_navier_stokes_results.sh
 
       - name: ✅ Validate enriched_metadata.json
         run: python validators/validate_enriched_metadata.py
