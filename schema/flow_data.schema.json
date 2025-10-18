@@ -48,7 +48,9 @@
       "required": ["default_resolution", "flow_region"],
       "properties": {
         "default_resolution": { "type": "integer", "minimum": 1 },
-        "flow_region": { "type": "string", "enum": ["internal", "external"] }
+        "flow_region": { "type": "string", "enum": ["internal", "external"] },
+        "flow_region_comment": { "type": "string" },
+        "no_slip": { "type": "boolean" }
       },
       "additionalProperties": false
     }
