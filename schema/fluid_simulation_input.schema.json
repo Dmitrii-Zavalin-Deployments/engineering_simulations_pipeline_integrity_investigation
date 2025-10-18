@@ -62,51 +62,66 @@
       "additionalProperties": false
     },
     "boundary_conditions": {
-      "type": "object",
-      "required": [
-        "x_min", "x_max", "y_min", "y_max", "z_min", "z_max",
-        "faces", "type", "apply_faces", "apply_to",
-        "pressure", "velocity", "no_slip"
-      ],
-      "properties": {
-        "x_min": { "type": "string" },
-        "x_max": { "type": "string" },
-        "y_min": { "type": "string" },
-        "y_max": { "type": "string" },
-        "z_min": { "type": "string" },
-        "z_max": { "type": "string" },
-        "faces": {
-          "type": "array",
-          "items": { "type": "integer", "minimum": 0 }
-        },
-        "type": {
-          "type": "string",
-          "enum": ["dirichlet", "neumann", "robin"]
-        },
-        "apply_faces": {
-          "type": "array",
-          "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "type", "apply_faces", "apply_to", "faces"],
+        "properties": {
+          "role": {
             "type": "string",
-            "enum": ["x_min", "x_max", "y_min", "y_max", "z_min", "z_max"]
-          }
-        },
-        "apply_to": {
-          "type": "array",
-          "items": {
+            "enum": ["inlet", "outlet", "wall"]
+          },
+          "type": {
             "type": "string",
-            "enum": ["velocity", "pressure"]
-          }
+            "enum": ["dirichlet", "neumann", "robin"]
+          },
+          "apply_faces": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["wall", "x_min", "x_max", "y_min", "y_max", "z_min", "z_max"]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["wall", "x_min", "x_max", "y_min", "y_max", "z_min", "z_max"]
+                }
+              }
+            ]
+          },
+          "faces": {
+            "type": "array",
+            "items": { "type": "integer" }
+          },
+          "apply_to": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["pressure", "velocity", "temperature"]
+            }
+          },
+          "pressure": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "velocity": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "no_slip": { "type": "boolean" },
+          "comment": { "type": "string" }
         },
-        "pressure": { "type": "number" },
-        "velocity": {
-          "type": "array",
-          "items": { "type": "number" },
-          "minItems": 3,
-          "maxItems": 3
-        },
-        "no_slip": { "type": "boolean" }
-      },
-      "additionalProperties": false
+        "additionalProperties": false
+      }
     },
     "geometry_definition": {
       "type": "object",
