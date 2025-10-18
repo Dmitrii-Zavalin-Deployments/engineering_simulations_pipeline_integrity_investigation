@@ -44,6 +44,7 @@ jobs:
   
   integrity-check:
     name: Integrity Investigation
+    needs: code_quality_check
     runs-on: ubuntu-latest
 
     steps:
