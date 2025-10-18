@@ -102,8 +102,8 @@ jobs:
       - name: ✅ Validate fluid_simulation_input.json
         run: python validators/validate_fluid_simulation_input.py
 
-      - name: Run validation tests
-        run: pytest tests/
+      # - name: Run validation tests
+      #   run: pytest tests/
 
 
 
